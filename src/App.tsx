@@ -27,14 +27,12 @@ function App() {
   const [income, setIncome] = useState(0)
   const [inputCurrency, setInputCurrency] = useState<Currency>(Currency.ARS)
   const [timeRange, setTimeRange] = useState<TimeRange>(TimeRange.Month)
-  const [dailyHours, setDailyHours] = useState(0)
+  const [dailyHours, setDailyHours] = useState(8)
 
   // OUTPUT
   const [outputCurrency, setOutputCurrency] = useState<Currency>(Currency.ARS)
   const [timeRangeResult, setTimeRangeResult] = useState<TimeRange>(TimeRange.Hour)
   const [result, setResult] = useState(0.0)
-
-  const [multiplicador, setMultiplicador] = useState(1)
 
   useEffect(() => {
     const input: IOType = {
@@ -53,12 +51,14 @@ function App() {
       [TimeRange.Hour]: 1
     }
 
+    let multiplicador = 1
+
     if (inputCurrency !== outputCurrency) {
-      setMultiplicador(outputCurrency === Currency.USD ? 1 / DOLAR_API : DOLAR_API)
+      multiplicador = outputCurrency === Currency.USD ? 1 / DOLAR_API : DOLAR_API
     }
 
     setResult(input[timeRange] * output[timeRangeResult] * multiplicador)
-  }, [income, dailyHours])
+  }, [income, dailyHours, timeRange, timeRangeResult, inputCurrency, outputCurrency])
 
   return (
     <>
@@ -82,7 +82,7 @@ function App() {
       </div>
       <div className="card">
         <p>Daily work hours</p>
-        <input type="number" onChange={(e) => setDailyHours(e.target.valueAsNumber)} placeholder='Hours every day' />
+        <input defaultValue={dailyHours} type="number" onChange={(e) => setDailyHours(e.target.valueAsNumber)} placeholder='Hours every day' />
       </div>
       <div className="card">
         <p>Output currency</p>
@@ -97,7 +97,7 @@ function App() {
         <ToggleRange state={TimeRange.Month} callback={setTimeRangeResult} selectedState={timeRangeResult} />
         <ToggleRange state={TimeRange.Year} callback={setTimeRangeResult} selectedState={timeRangeResult} />
       </div>
-      <h1>Result: {result.toFixed(2)} {outputCurrency} every {timeRangeResult}</h1>
+      <h2>Result: {result.toFixed(2)} {outputCurrency} every {timeRangeResult}</h2>
     </>
   )
 }

@@ -33,6 +33,10 @@
   }
 }
 
+p {
+  line-height: .5;
+}
+
 .card {
   padding: 1em;
 }
@@ -41,13 +45,12 @@
   color: #888;
 }
 
-
 .card button, .card input {
   border-radius: 8px;
   border: 1px solid #9C9C9C;
   margin: .3em;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: .9em;
   font-weight: 500;
   font-family: inherit;
   background-color: #1C1F24;
