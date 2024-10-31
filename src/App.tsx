@@ -19,9 +19,19 @@ type IOType = {
   [x in TimeRange]: number
 }
 
+function getDolarBlue(defaultValue: number) {
+  return fetch('https://api.bluelytics.com.ar/v2/latest')
+    .then(res => res.json())
+    .then(res => res.blue.value_sell as number)
+    .catch(e => {
+      console.error(e)
+      return defaultValue
+    })
+}
+
 function App() {
-  const DOLAR_API = 1180
-  const LABOR_DAYS = 249
+  const LABOR_DAYS = 247
+  const [dolar, setDolar] = useState(0)
 
   // INPUT
   const [income, setIncome] = useState(0)
@@ -33,6 +43,10 @@ function App() {
   const [outputCurrency, setOutputCurrency] = useState<Currency>(Currency.ARS)
   const [timeRangeResult, setTimeRangeResult] = useState<TimeRange>(TimeRange.Hour)
   const [result, setResult] = useState(0.0)
+
+  useEffect(() => {
+    getDolarBlue(1180).then(setDolar)
+  }, [])
 
   useEffect(() => {
     const input: IOType = {
@@ -54,11 +68,11 @@ function App() {
     let multiplicador = 1
 
     if (inputCurrency !== outputCurrency) {
-      multiplicador = outputCurrency === Currency.USD ? 1 / DOLAR_API : DOLAR_API
+      multiplicador = outputCurrency === Currency.USD ? 1 / dolar : dolar
     }
 
     setResult(input[timeRange] * output[timeRangeResult] * multiplicador)
-  }, [income, dailyHours, timeRange, timeRangeResult, inputCurrency, outputCurrency])
+  }, [income, dailyHours, timeRange, timeRangeResult, inputCurrency, outputCurrency, dolar])
 
   return (
     <>
@@ -98,6 +112,8 @@ function App() {
         <ToggleRange state={TimeRange.Year} callback={setTimeRangeResult} selectedState={timeRangeResult} />
       </div>
       <h2>Result: {result.toFixed(2)} {outputCurrency} every {timeRangeResult}</h2>
+      <p>1 ARS = {dolar} USD (<a href='https://api.bluelytics.com.ar/v2/latest'>api.bluelytics.com.ar</a>)</p>
+      <p>{LABOR_DAYS} working days in a year (<a href='https://argentina.workingdays.org/dias_laborables_feriados_2024.htm'>argentina.workingdays.org</a>)</p>
     </>
   )
 }
